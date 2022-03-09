@@ -7,8 +7,10 @@
 
 import Foundation
 // Model
-struct MemoryGame<CardContent> {
+struct MemoryGame<CardContent> where CardContent: Equatable {
     private(set) var cards: Array<Card>
+    
+    private var indexOfTheOnlyFaceUpCard: Int?
     
     init(numberOfPairOfCards: Int, createCardContent: (Int) -> CardContent) {
         cards = Array<Card>()
@@ -20,7 +22,22 @@ struct MemoryGame<CardContent> {
     }
     
     mutating func choose(_ card: Card) {
-        if let index = findIndex(card: card) {
+        if let index = findIndex(card: card), !cards[index].isFaceUp, !cards[index].isMatched {
+            if let potentialMatchIndex = indexOfTheOnlyFaceUpCard {
+                if cards[potentialMatchIndex].content == cards[index].content {
+                    cards[index].isMatched = true
+                    cards[potentialMatchIndex].isMatched = true
+                }
+                
+                indexOfTheOnlyFaceUpCard = nil
+            } else {
+                for index in cards.indices {
+                    cards[index].isFaceUp = false
+                }
+                
+                indexOfTheOnlyFaceUpCard = index
+            }
+            
             cards[index].isFaceUp.toggle()
         }
     }

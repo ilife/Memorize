@@ -20,12 +20,13 @@ struct MemoryGame<CardContent> {
     }
     
     mutating func choose(_ card: Card) {
-        let index = findIndex(card: card)
-        cards[index].isFaceUp.toggle()
+        if let index = findIndex(card: card) {
+            cards[index].isFaceUp.toggle()
+        }
     }
     
-    func findIndex(card: Card) -> Int {
-        return cards.enumerated().filter({ card.id == $0.element.id }).map({ $0.offset }).first!
+    func findIndex(card: Card) -> Int? {
+        return cards.firstIndex(where: { cardInArray in cardInArray.id == card.id })
     }
     
     struct Card: Identifiable {

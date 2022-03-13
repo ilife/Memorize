@@ -11,18 +11,7 @@ struct EmojiMemoryGameView: View {
     @ObservedObject var game: EmojiMemoryGame
     
     var body: some View {
-        AspectVGrid(items: game.model.cards, aspectRatio: 2/3, content: { card in
-            cardView(for: card)
-        })
-        .foregroundColor(.orange)
-        .padding()
-    }
-    
-    @ViewBuilder
-    private func cardView(for card: EmojiMemoryGame.Card) -> some View {
-        if card.isMatched && !card.isFaceUp {
-            Rectangle().opacity(0)
-        } else {
+        AspectVGrid(items: game.model.cards, aspectRatio: 2/3) { card in
             CardView(card: card)
                 .padding(4)
                 .aspectRatio(2/3, contentMode: .fit)
@@ -30,6 +19,8 @@ struct EmojiMemoryGameView: View {
                     game.choose(card)
                 }
         }
+        .foregroundColor(.orange)
+        .padding()
     }
 }
 
@@ -45,6 +36,7 @@ struct CardView: View {
                 if card.isFaceUp {
                     shape.fill().foregroundColor(.white)
                     shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+                    Circle().padding(8)
                     Text(card.content).font(font(size: geometry.size))
                 } else if card.isMatched {
                     shape.opacity(0)
@@ -62,7 +54,7 @@ struct CardView: View {
     private struct DrawingConstants {
         static let cornerRadius: CGFloat = 20
         static let lineWidth: CGFloat = 5
-        static let fontScale: CGFloat = 0.8
+        static let fontScale: CGFloat = 0.55
     }
 }
 
@@ -71,9 +63,7 @@ struct CardView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        EmojiMemoryGameView(game: game)
-            .preferredColorScheme(.dark)
-        EmojiMemoryGameView(game: game)
-            .preferredColorScheme(.light)
+        game.choose(game.model.cards.first!)
+        return EmojiMemoryGameView(game: game)
     }
 }
